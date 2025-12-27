@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Real-time weather warnings and forecasts for South Africa">
+    <meta name="theme-color" content="#0ea5e9">
+    <title>StormWarn - Weather Warnings for South Africa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #f8f7f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .location {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .temperature {
+            font-size: 4rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+        
+        .condition {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .weather-icon {
+            font-size: 3rem;
+        }
+        
+        .details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        .detail {
+            padding: 1rem;
+            background: #f8f7f5;
+            border-radius: 8px;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .detail-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #e5e5e5;
+            border-top-color: #0ea5e9;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #dc2626;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background: #0284c7;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #0ea5e9;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        
+        .search-results.active {
+            display: block;
+        }
+        
+        .search-result {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .search-result:hover {
+            background: #f8f9fa;
+        }
+        
+        .search-result:last-child {
+            border-bottom: none;
+        }
+        
+        .result-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .result-location {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+        
+        .btn-secondary {
+            padding: 0.75rem 1.5rem;
+            background: white;
+            color: #1a1a1a;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+        
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .saved-locations {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        
+        .saved-location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .saved-location:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        
+        .saved-location.active {
+            background: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+        }
+        
+        .remove-location {
+            margin-left: 0.25rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .remove-location:hover {
+            color: #dc2626;
+        }
+        
+        .saved-locations-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            transition: background 0.2s;
+        }
+        
+        .share-btn:hover {
+            background: #20ba5a;
+        }
+        
+        .share-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+        
+        .share-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .warnings-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .warnings-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .warning-item {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid;
+        }
+        
+        .warning-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .warning-red {
+            background: #fee;
+            border-color: #dc2626;
+        }
+        
+        .warning-orange {
+            background: #ffedd5;
+            border-color: #f97316;
+        }
+        
+        .warning-yellow {
+            background: #fef9c3;
+            border-color: #eab308;
+        }
+        
+        .warning-level {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .warning-red .warning-level {
+            color: #dc2626;
+        }
+        
+        .warning-orange .warning-level {
+            color: #f97316;
+        }
+        
+        .warning-yellow .warning-level {
+            color: #eab308;
+        }
+        
+        .warning-type {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .warning-message {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .no-warnings {
+            text-align: center;
+            padding: 2rem;
+            color: #22c55e;
+        }
+        
+        .no-warnings-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .forecast-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .forecast-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .forecast-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .forecast-day {
+            display: grid;
+            grid-template-columns: 100px 60px 1fr 120px 120px;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f7f5;
+            border-radius: 8px;
+        }
+        
+        .forecast-day.today {
+            background: #e0f2fe;
+            border: 2px solid #0ea5e9;
+        }
+        
+        .forecast-date {
+            font-weight: 600;
+        }
+        
+        .forecast-day.today .forecast-date {
+            color: #0ea5e9;
+            font-weight: 700;
+        }
+        
+        .forecast-icon-day {
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .forecast-condition {
+            color: #666;
+        }
+        
+        .forecast-temp {
+            font-weight: 600;
+        }
+        
+        .forecast-temp-high {
+            color: #dc2626;
+        }
+        
+        .forecast-temp-low {
+            color: #0ea5e9;
+        }
+        
+        .forecast-precip {
+            color: #0ea5e9;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .forecast-day {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+                text-align: center;
+            }
+            
+            .forecast-icon-day {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚠️ StormWarn</div>
+        </div>
+        
+        <div class="search-bar">
+            <div class="search-wrapper">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput"
+                    placeholder="Search for a location..."
+                    autocomplete="off"
+                />
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <button class="btn-secondary" id="saveBtn" onclick="saveLocation()" disabled>
+                ⭐ Save Location
+            </button>
+        </div>
+        
+        <div id="savedLocationsContainer" style="display: none;">
+            <div class="saved-locations-label">📍 Saved Locations</div>
+            <div class="saved-locations" id="savedLocations"></div>
+        </div>
+        
+        <div id="app">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading weather data...</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('StormWarn: App starting...');
+        
+        const app = document.getElementById('app');
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        const saveBtn = document.getElementById('saveBtn');
+        const savedLocationsContainer = document.getElementById('savedLocationsContainer');
+        const savedLocationsDiv = document.getElementById('savedLocations');
+        
+        let currentLocation = null;
+        let savedLocations = [];
+        let searchTimeout = null;
+        
+        // Load saved locations from localStorage
+        function loadSavedLocations() {
+            const saved = localStorage.getItem('stormwarn_locations');
+            if (saved) {
+                savedLocations = JSON.parse(saved);
+                renderSavedLocations();
+            }
+        }
+        
+        // Save locations to localStorage
+        function saveSavedLocations() {
+            localStorage.setItem('stormwarn_locations', JSON.stringify(savedLocations));
+            renderSavedLocations();
+        }
+        
+        // Render saved locations
+        function renderSavedLocations() {
+            if (savedLocations.length === 0) {
+                savedLocationsContainer.style.display = 'none';
+                return;
+            }
+            
+            savedLocationsContainer.style.display = 'block';
+            savedLocationsDiv.innerHTML = savedLocations.map((loc, index) => {
+                const isActive = currentLocation && 
+                    Math.abs(currentLocation.lat - loc.lat) < 0.01 && 
+                    Math.abs(currentLocation.lon - loc.lon) < 0.01;
+                return `
+                    <div class="saved-location ${isActive ? 'active' : ''}" onclick="loadSavedLocation(${index})">
+                        <span>${loc.name}</span>
+                        <span class="remove-location" onclick="event.stopPropagation(); removeSavedLocation(${index})">×</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Save current location
+        function saveLocation() {
+            if (!currentLocation) return;
+            
+            // Check if already saved
+            const exists = savedLocations.some(loc => 
+                Math.abs(loc.lat - currentLocation.lat) < 0.01 && 
+                Math.abs(loc.lon - currentLocation.lon) < 0.01
+            );
+            
+            if (exists) {
+                alert('This location is already saved!');
+                return;
+            }
+            
+            savedLocations.push({
+                name: currentLocation.name,
+                lat: currentLocation.lat,
+                lon: currentLocation.lon
+            });
+            
+            saveSavedLocations();
+            updateSaveButton();
+        }
+        
+        // Load a saved location
+        function loadSavedLocation(index) {
+            const loc = savedLocations[index];
+            loadWeather(loc.lat, loc.lon, loc.name);
+        }
+        
+        // Remove a saved location
+        function removeSavedLocation(index) {
+            savedLocations.splice(index, 1);
+            saveSavedLocations();
+            updateSaveButton();
+        }
+        
+        // Update save button state
+        function updateSaveButton() {
+            if (!currentLocation) {
+                saveBtn.disabled = true;
+                return;
+            }
+            
+            const exists = savedLocations.some(loc => 
+                Math.abs(loc.lat - currentLocation.lat) < 0.01 && 
+                Math.abs(loc.lon - currentLocation.lon) < 0.01
+            );
+            
+            if (exists) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = '✓ Saved';
+            } else {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '⭐ Save Location';
+            }
+        }
+        
+        // Search for locations
+        async function searchLocation(query) {
+            if (!query.trim()) {
+                searchResults.classList.remove('active');
+                return;
+            }
+            
+            try {
+                const res = await fetch(
+                    `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=5&language=en&format=json`
+                );
+                const data = await res.json();
+                
+                if (!data.results || data.results.length === 0) {
+                    searchResults.innerHTML = '<div class="search-result">No results found</div>';
+                    searchResults.classList.add('active');
+                    return;
+                }
+                
+                searchResults.innerHTML = data.results.map(result => `
+                    <div class="search-result" onclick="selectLocation(${result.latitude}, ${result.longitude}, '${result.name.replace(/'/g, "\\'")}')">
+                        <div class="result-name">${result.name}</div>
+                        <div class="result-location">${result.admin1 || ''} ${result.country || ''}</div>
+                    </div>
+                `).join('');
+                searchResults.classList.add('active');
+            } catch (error) {
+                console.error('Search failed:', error);
+            }
+        }
+        
+        // Select a search result
+        function selectLocation(lat, lon, name) {
+            searchResults.classList.remove('active');
+            searchInput.value = '';
+            loadWeather(lat, lon, name);
+        }
+        
+        // Setup search input
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchLocation(e.target.value);
+            }, 300);
+        });
+        
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrapper')) {
+                searchResults.classList.remove('active');
+            }
+        });
+        
+        // Get weather description from code
+        function getWeatherDescription(code) {
+            const descriptions = {
+                0: 'Clear sky', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Overcast',
+                45: 'Fog', 48: 'Rime fog',
+                51: 'Light drizzle', 53: 'Drizzle', 55: 'Dense drizzle',
+                61: 'Slight rain', 63: 'Rain', 65: 'Heavy rain',
+                71: 'Slight snow', 73: 'Snow', 75: 'Heavy snow',
+                80: 'Rain showers', 81: 'Heavy showers', 82: 'Violent showers',
+                95: 'Thunderstorm', 96: 'Thunderstorm with hail', 99: 'Severe thunderstorm'
+            };
+            return descriptions[code] || 'Unknown';
+        }
+        
+        // Get weather icon emoji from code
+        function getWeatherIcon(code) {
+            const icons = {
+                0: '☀️',   // Clear sky
+                1: '🌤️',   // Mainly clear
+                2: '⛅',   // Partly cloudy
+                3: '☁️',   // Overcast
+                45: '🌫️',  // Fog
+                48: '🌫️',  // Rime fog
+                51: '🌦️',  // Light drizzle
+                53: '🌧️',  // Drizzle
+                55: '🌧️',  // Dense drizzle
+                61: '🌧️',  // Slight rain
+                63: '🌧️',  // Rain
+                65: '⛈️',  // Heavy rain
+                71: '🌨️',  // Slight snow
+                73: '❄️',  // Snow
+                75: '❄️',  // Heavy snow
+                80: '🌦️',  // Rain showers
+                81: '⛈️',  // Heavy showers
+                82: '⛈️',  // Violent showers
+                95: '⛈️',  // Thunderstorm
+                96: '⛈️',  // Thunderstorm with hail
+                99: '⛈️'   // Severe thunderstorm
+            };
+            return icons[code] || '🌤️';
+        }
+        
+        // Get wind direction
+        function getWindDirection(degrees) {
+            const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+            return dirs[Math.round(degrees / 22.5) % 16];
+        }
+        
+        // Generate detailed weather warnings based on conditions
+        function generateWarnings(current) {
+            const warnings = [];
+            
+            // WIND WARNINGS
+            if (current.wind_speed_10m >= 75) {
+                warnings.push({
+                    level: 'Level 10 (Red)',
+                    color: 'warning-red',
+                    type: 'Destructive Winds - EXTREME DANGER',
+                    message: `Destructive winds ${Math.round(current.wind_speed_10m)} km/h. Catastrophic damage expected. Widespread destruction of structures. TAKE SHELTER IMMEDIATELY. Do NOT go outside.`
+                });
+            } else if (current.wind_speed_10m >= 60) {
+                warnings.push({
+                    level: 'Level 8 (Orange)',
+                    color: 'warning-orange',
+                    type: 'Damaging Winds - HIGH DANGER',
+                    message: `Damaging winds ${Math.round(current.wind_speed_10m)} km/h. Trees may be uprooted. Structural damage possible. Stay indoors away from windows.`
+                });
+            } else if (current.wind_speed_10m >= 50) {
+                warnings.push({
+                    level: 'Level 6 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Severe Wind Warning',
+                    message: `Severe winds ${Math.round(current.wind_speed_10m)} km/h. Flying debris and falling branches likely. Difficult driving conditions. Avoid travel if possible.`
+                });
+            } else if (current.wind_speed_10m >= 40) {
+                warnings.push({
+                    level: 'Level 4 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Strong Wind Warning',
+                    message: `Strong winds ${Math.round(current.wind_speed_10m)} km/h. Secure loose objects. Drive carefully, especially high-profile vehicles.`
+                });
+            }
+            
+            // EXTREME HEAT WARNINGS
+            if (current.temperature_2m >= 43) {
+                warnings.push({
+                    level: 'Level 10 (Red)',
+                    color: 'warning-red',
+                    type: 'Extreme Heat - CATASTROPHIC',
+                    message: `Catastrophic heat ${Math.round(current.temperature_2m)}°C. Widespread heat stroke. Elderly and vulnerable at extreme risk. Infrastructure failure possible. Stay indoors with AC.`
+                });
+            } else if (current.temperature_2m >= 40) {
+                warnings.push({
+                    level: 'Level 8 (Orange)',
+                    color: 'warning-orange',
+                    type: 'Extreme Heat - SEVERE',
+                    message: `Extreme heat ${Math.round(current.temperature_2m)}°C. Heat stroke highly likely. Vulnerable groups at high risk. Avoid all outdoor activity. Drink plenty of water.`
+                });
+            } else if (current.temperature_2m >= 38) {
+                warnings.push({
+                    level: 'Level 6 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Extreme Heat Warning',
+                    message: `Extreme heat ${Math.round(current.temperature_2m)}°C. Heat exhaustion and cramps likely. Stay hydrated. Limit outdoor exposure.`
+                });
+            } else if (current.temperature_2m >= 35) {
+                warnings.push({
+                    level: 'Level 4 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Heat Advisory',
+                    message: `Very hot conditions ${Math.round(current.temperature_2m)}°C. Heat exhaustion possible. Drink plenty of water. Take breaks in shade.`
+                });
+            }
+            
+            // HEAT INDEX WARNING
+            if (current.apparent_temperature >= 45 && current.apparent_temperature > current.temperature_2m + 3) {
+                warnings.push({
+                    level: 'Level 8 (Orange)',
+                    color: 'warning-orange',
+                    type: 'Dangerous Heat Index',
+                    message: `Feels like ${Math.round(current.apparent_temperature)}°C. Extreme heat stress due to humidity. Heat exhaustion imminent with prolonged exposure.`
+                });
+            }
+            
+            // COLD WARNINGS
+            if (current.temperature_2m <= -10) {
+                warnings.push({
+                    level: 'Level 9 (Orange)',
+                    color: 'warning-orange',
+                    type: 'Extreme Cold - SEVERE',
+                    message: `Dangerously cold ${Math.round(current.temperature_2m)}°C. Frostbite in minutes. Life-threatening hypothermia. Water pipes may burst. Stay indoors.`
+                });
+            } else if (current.temperature_2m <= 0) {
+                warnings.push({
+                    level: 'Level 6 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Freezing Conditions',
+                    message: `Freezing ${Math.round(current.temperature_2m)}°C. Icy roads. Burst pipes possible. Protect vulnerable people and plants.`
+                });
+            } else if (current.temperature_2m <= 5) {
+                warnings.push({
+                    level: 'Level 3 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Cold Weather Advisory',
+                    message: `Very cold ${Math.round(current.temperature_2m)}°C. Frost likely overnight. Dress warmly.`
+                });
+            }
+            
+            // SEVERE WEATHER WARNINGS (based on weather codes)
+            if ([95, 96, 99].includes(current.weather_code)) {
+                if (current.weather_code === 99) {
+                    warnings.push({
+                        level: 'Level 9 (Orange)',
+                        color: 'warning-red',
+                        type: 'Severe Thunderstorm - EXTREME',
+                        message: 'Violent thunderstorms with very large hail. Severe damage to property and crops. Life-threatening lightning. Seek substantial shelter immediately.'
+                    });
+                } else if (current.weather_code === 96) {
+                    warnings.push({
+                        level: 'Level 7 (Orange)',
+                        color: 'warning-orange',
+                        type: 'Severe Thunderstorm with Hail',
+                        message: 'Severe thunderstorms with large hail. Damage to vehicles and structures. Dangerous lightning. Take shelter now.'
+                    });
+                } else {
+                    warnings.push({
+                        level: 'Level 6 (Yellow)',
+                        color: 'warning-yellow',
+                        type: 'Severe Thunderstorm Warning',
+                        message: 'Severe thunderstorms approaching. Lightning, heavy rain, possible hail and strong winds. Move indoors away from windows.'
+                    });
+                }
+            } else if (current.weather_code === 82) {
+                warnings.push({
+                    level: 'Level 5 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Violent Rain Showers',
+                    message: 'Violent rain showers. Flash flooding in low-lying areas. Avoid rivers and streams. Drive with extreme caution.'
+                });
+            } else if (current.weather_code === 81) {
+                warnings.push({
+                    level: 'Level 4 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Heavy Rain Showers',
+                    message: 'Heavy rain expected. Minor flooding possible. Roads may be slippery. Reduce speed.'
+                });
+            }
+            
+            // SNOW/ICE WARNINGS
+            if ([71, 73, 75].includes(current.weather_code)) {
+                if (current.weather_code === 75) {
+                    warnings.push({
+                        level: 'Level 9 (Orange)',
+                        color: 'warning-orange',
+                        type: 'Heavy Snow - SEVERE',
+                        message: 'Heavy snowfall. Major travel disruption. Blizzard conditions. Road closures. Do not travel.'
+                    });
+                } else if (current.weather_code === 73) {
+                    warnings.push({
+                        level: 'Level 6 (Yellow)',
+                        color: 'warning-yellow',
+                        type: 'Significant Snow',
+                        message: 'Significant snowfall. Hazardous travel. Icy roads. Travel only if essential.'
+                    });
+                } else {
+                    warnings.push({
+                        level: 'Level 3 (Yellow)',
+                        color: 'warning-yellow',
+                        type: 'Light Snow',
+                        message: 'Light snow. Slippery roads possible. Reduce speed and increase following distance.'
+                    });
+                }
+            }
+            
+            // FOG WARNING
+            if ([45, 48].includes(current.weather_code)) {
+                warnings.push({
+                    level: 'Level 4 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'Dense Fog',
+                    message: 'Dense fog. Visibility severely reduced. Hazardous driving. Use fog lights. Allow extra travel time.'
+                });
+            }
+            
+            // FIRE DANGER (combined conditions)
+            if (current.relative_humidity_2m <= 20 && current.temperature_2m >= 32 && current.wind_speed_10m >= 30) {
+                warnings.push({
+                    level: 'Level 9 (Orange)',
+                    color: 'warning-red',
+                    type: 'Extreme Fire Danger',
+                    message: `Critical fire weather. Very hot (${Math.round(current.temperature_2m)}°C), extremely dry (${current.relative_humidity_2m}% humidity), strong winds (${Math.round(current.wind_speed_10m)} km/h). NO outdoor burning. Fires spread explosively.`
+                });
+            } else if (current.relative_humidity_2m <= 30 && current.temperature_2m >= 30 && current.wind_speed_10m >= 25) {
+                warnings.push({
+                    level: 'Level 6 (Yellow)',
+                    color: 'warning-yellow',
+                    type: 'High Fire Danger',
+                    message: 'High fire danger. Hot, dry, windy conditions favor rapid fire spread. Avoid open flames. Monitor fire alerts.'
+                });
+            }
+            
+            return warnings;
+        }
+        
+        // Share weather via WhatsApp
+        function shareWeather() {
+            if (!currentLocation || !currentLocation.weather) return;
+            
+            const current = currentLocation.weather;
+            const warnings = generateWarnings(current);
+            const precipProb = currentLocation.precipProb || 0;
+            
+            let message = `⚠️ StormWarn Weather Update\n\n`;
+            message += `📍 ${currentLocation.name}\n`;
+            message += `${getWeatherIcon(current.weather_code)} ${Math.round(current.temperature_2m)}°C - ${getWeatherDescription(current.weather_code)}\n`;
+            message += `💨 Wind: ${Math.round(current.wind_speed_10m)} km/h ${getWindDirection(current.wind_direction_10m)}\n`;
+            message += `💧 Humidity: ${current.relative_humidity_2m}%\n`;
+            message += `☔ Precipitation: ${precipProb}% chance\n`;
+            message += `🌡️ Feels like: ${Math.round(current.apparent_temperature)}°C\n`;
+            
+            if (warnings.length > 0) {
+                message += `\n⚠️ ACTIVE WARNINGS:\n`;
+                warnings.forEach(warning => {
+                    message += `\n${warning.level} - ${warning.type}\n`;
+                    message += `${warning.message}\n`;
+                });
+            } else {
+                message += `\n✅ No active warnings\n`;
+            }
+            
+            message += `\nView live updates: ${window.location.href}`;
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        // Fetch and display weather
+        async function loadWeather(lat, lon, customName = null) {
+            try {
+                console.log(`StormWarn: Fetching weather for ${lat}, ${lon}`);
+                
+                app.innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading weather data...</p>
+                    </div>
+                `;
+                
+                let locationName;
+                
+                // Get location name
+                if (customName) {
+                    locationName = customName;
+                } else {
+                    const geoRes = await fetch(
+                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+                    );
+                    const geoData = await geoRes.json();
+                    locationName = `${geoData.city || 'Unknown'}, ${geoData.principalSubdivision || ''}`;
+                }
+                
+                // Get weather data
+                const weatherRes = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=auto&forecast_days=14`
+                );
+                
+                if (!weatherRes.ok) {
+                    throw new Error(`Weather API error: ${weatherRes.status}`);
+                }
+                
+                const weather = await weatherRes.json();
+                const current = weather.current;
+                
+                // Get current hour's precipitation probability
+                const currentHour = new Date().getHours();
+                const precipProb = weather.hourly.precipitation_probability[currentHour] || 0;
+                
+                // Store current location and weather data
+                currentLocation = { lat, lon, name: locationName, weather: current, precipProb };
+                
+                console.log('StormWarn: Weather data loaded successfully');
+                
+                // Generate warnings
+                const warnings = generateWarnings(current);
+                
+                // Display warnings
+                let warningsHTML = '';
+                if (warnings.length > 0) {
+                    warningsHTML = `
+                        <div class="warnings-card">
+                            <div class="warnings-header">
+                                ⚠️ Active Warnings
+                            </div>
+                            ${warnings.map(warning => `
+                                <div class="warning-item ${warning.color}">
+                                    <div class="warning-level">${warning.level}</div>
+                                    <div class="warning-type">${warning.type}</div>
+                                    <div class="warning-message">${warning.message}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else {
+                    warningsHTML = `
+                        <div class="warnings-card no-warnings">
+                            <div class="no-warnings-icon">✅</div>
+                            <div style="font-weight: 600; font-size: 1.1rem;">No Active Warnings</div>
+                            <div style="color: #666; margin-top: 0.5rem;">All clear in your area. Check back regularly for updates.</div>
+                        </div>
+                    `;
+                }
+                
+                // Display weather
+                app.innerHTML = warningsHTML + `
+                    <div class="card">
+                        <div class="location">${locationName}</div>
+                        <div class="temperature">${Math.round(current.temperature_2m)}°C</div>
+                        <div class="condition">
+                            <span class="weather-icon">${getWeatherIcon(current.weather_code)}</span>
+                            <span>${getWeatherDescription(current.weather_code)}</span>
+                        </div>
+                        
+                        <div class="details">
+                            <div class="detail">
+                                <div class="detail-label">Wind</div>
+                                <div class="detail-value">
+                                    ${Math.round(current.wind_speed_10m)} km/h ${getWindDirection(current.wind_direction_10m)}
+                                </div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">Humidity</div>
+                                <div class="detail-value">${current.relative_humidity_2m}%</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">Precipitation</div>
+                                <div class="detail-value">${precipProb}% chance</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">Feels Like</div>
+                                <div class="detail-value">${Math.round(current.apparent_temperature)}°C</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">Pressure</div>
+                                <div class="detail-value">${Math.round(current.pressure_msl)} hPa</div>
+                            </div>
+                        </div>
+                        
+                        <div class="share-section">
+                            <button class="share-btn" onclick="shareWeather()">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                </svg>
+                                Share via WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add 10-day forecast
+                const daily = weather.daily;
+                if (daily && daily.time) {
+                    const forecastDays = daily.time.slice(0, 10); // Get first 10 days
+                    
+                    const forecastHTML = `
+                        <div class="forecast-card">
+                            <div class="forecast-header">📅 10-Day Forecast</div>
+                            <div class="forecast-list">
+                                ${forecastDays.map((date, index) => {
+                                    const isToday = index === 0;
+                                    const dayDate = new Date(date);
+                                    const dayName = isToday ? 'Today' : dayDate.toLocaleDateString('en-US', { weekday: 'long' });
+                                    const dateStr = dayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                                    
+                                    const weatherCode = daily.weather_code[index];
+                                    const tempMax = Math.round(daily.temperature_2m_max[index]);
+                                    const tempMin = Math.round(daily.temperature_2m_min[index]);
+                                    const precipSum = daily.precipitation_sum ? daily.precipitation_sum[index] : 0;
+                                    const precipProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[index] : 0;
+                                    const windMax = daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[index]) : 0;
+                                    
+                                    return `
+                                        <div class="forecast-day ${isToday ? 'today' : ''}">
+                                            <div class="forecast-date">
+                                                <div style="font-weight: 700;">${dayName}</div>
+                                                <div style="font-size: 0.9rem; color: #666;">${dateStr}</div>
+                                            </div>
+                                            <div class="forecast-icon-day">${getWeatherIcon(weatherCode)}</div>
+                                            <div class="forecast-condition">${getWeatherDescription(weatherCode)}</div>
+                                            <div class="forecast-temp">
+                                                <span class="forecast-temp-high">${tempMax}°</span> / 
+                                                <span class="forecast-temp-low">${tempMin}°</span>
+                                            </div>
+                                            <div>
+                                                ${precipProb > 0 ? `<div class="forecast-precip">💧 ${precipProb}% chance</div>` : '<div style="color: #999;">No rain</div>'}
+                                                ${windMax > 30 ? `<div style="font-size: 0.9rem; color: #666;">💨 ${windMax} km/h</div>` : ''}
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                    
+                    app.innerHTML += forecastHTML;
+                }
+                
+                updateSaveButton();
+                renderSavedLocations();
+                
+            } catch (error) {
+                console.error('StormWarn: Error loading weather:', error);
+                app.innerHTML = `
+                    <div class="card error">
+                        <h2>Failed to load weather data</h2>
+                        <p>${error.message}</p>
+                        <button class="btn" onclick="init()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialize app
+        function init() {
+            console.log('StormWarn: Initializing...');
+            
+            loadSavedLocations();
+            
+            // Try to get user location, fallback to Cape Town
+            if (navigator.geolocation) {
+                console.log('StormWarn: Requesting geolocation...');
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        console.log('StormWarn: Got user location');
+                        loadWeather(position.coords.latitude, position.coords.longitude);
+                    },
+                    (error) => {
+                        console.log('StormWarn: Geolocation failed, using Cape Town');
+                        loadWeather(-33.9249, 18.4241);
+                    },
+                    { timeout: 10000 }
+                );
+            } else {
+                console.log('StormWarn: Geolocation not available, using Cape Town');
+                loadWeather(-33.9249, 18.4241);
+            }
+        }
+        
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
