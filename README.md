@@ -203,11 +203,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-**Manus** - [GitHub Profile](https://github.com/yourusername)
+**StormWarn** - [GitHub Profile](https://github.com/krugerjpj82)
 
-Project Link: [https://github.com/yourusername/stormwarn](https://github.com/yourusername/stormwarn)
+Project Link:  https://krugerjpj82.github.io/StormWarn/
 
-Live Demo: [https://stormwarn.manus.space](https://stormwarn.manus.space)
 
 ---
 
