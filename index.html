@@ -5,6 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Real-time weather warnings and forecasts for South Africa">
     <meta name="theme-color" content="#0ea5e9">
+    <link rel="manifest" id="manifest-placeholder">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%230ea5e9' width='180' height='180'/%3E%3Ctext x='50%25' y='50%25' font-size='100' font-weight='bold' fill='white' text-anchor='middle' dy='.3em'%3E⚠%3C/text%3E%3C/svg%3E">
+    <script>
+        // Create manifest dynamically
+        const manifest = {
+            "name": "StormWarn - Weather Warnings for South Africa",
+            "short_name": "StormWarn",
+            "description": "Real-time weather warnings and forecasts for South Africa with severe weather alerts",
+            "start_url": "/",
+            "display": "standalone",
+            "background_color": "#f8f7f5",
+            "theme_color": "#0ea5e9",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect fill='%230ea5e9' width='192' height='192'/%3E%3Ctext x='50%25' y='50%25' font-size='120' font-weight='bold' fill='white' text-anchor='middle' dy='.3em'%3E⚠%3C/text%3E%3C/svg%3E",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                },
+                {
+                    "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect fill='%230ea5e9' width='512' height='512'/%3E%3Ctext x='50%25' y='50%25' font-size='300' font-weight='bold' fill='white' text-anchor='middle' dy='.3em'%3E⚠%3C/text%3E%3C/svg%3E",
+                    "sizes": "512x512",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                }
+            ],
+            "categories": ["weather", "utilities", "lifestyle"],
+            "screenshots": []
+        };
+        
+        const stringManifest = JSON.stringify(manifest);
+        const blob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(blob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+    </script>
     <title>StormWarn - Weather Warnings for South Africa</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -291,6 +327,79 @@
             fill: white;
         }
         
+        .install-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #0ea5e9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-left: auto;
+        }
+        
+        .install-btn:hover {
+            background: #0284c7;
+        }
+        
+        .install-btn.show {
+            display: inline-flex;
+        }
+        
+        .notifications-btn {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .notifications-btn:hover {
+            background: #ea580c;
+        }
+        
+        .notifications-btn.show {
+            display: inline-flex;
+        }
+        
+        .notifications-btn.enabled {
+            background: #22c55e;
+        }
+        
+        .notifications-btn.enabled:hover {
+            background: #16a34a;
+        }
+        
+        .notifications-status {
+            display: none;
+            padding: 1rem;
+            background: #fff7ed;
+            border: 2px solid #f97316;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .notifications-status.show {
+            display: block;
+        }
+        
+        .notifications-status.enabled {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+        
         .share-section {
             margin-top: 1.5rem;
             padding-top: 1.5rem;
@@ -467,7 +576,17 @@
     <div class="container">
         <div class="header">
             <div class="logo">⚠️ StormWarn</div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="install-btn" id="installBtn" onclick="installPWA()">
+                    📱 Add to Home Screen
+                </button>
+                <button class="notifications-btn" id="notificationsBtn" onclick="toggleNotifications()">
+                    🔔 Enable Alerts
+                </button>
+            </div>
         </div>
+        
+        <div class="notifications-status" id="notificationsStatus"></div>
         
         <div class="search-bar">
             <div class="search-wrapper">
@@ -511,6 +630,337 @@
         let currentLocation = null;
         let savedLocations = [];
         let searchTimeout = null;
+        let deferredPrompt = null;
+        let notificationPermission = 'default';
+        
+        // Check notification permission on load
+        if ('Notification' in window) {
+            notificationPermission = Notification.permission;
+            updateNotificationButton();
+        }
+        
+        // Update notification button state
+        function updateNotificationButton() {
+            const btn = document.getElementById('notificationsBtn');
+            const status = document.getElementById('notificationsStatus');
+            
+            if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+                // Browser doesn't support notifications
+                return;
+            }
+            
+            btn.classList.add('show');
+            
+            if (notificationPermission === 'granted') {
+                btn.textContent = '✅ Alerts Enabled';
+                btn.classList.add('enabled');
+                status.classList.add('show', 'enabled');
+                status.innerHTML = `
+                    <strong>✅ Severe Weather Alerts Enabled</strong><br>
+                    <span style="font-size: 0.9rem; color: #166534;">You'll receive notifications for severe weather in your area</span>
+                `;
+            } else if (notificationPermission === 'denied') {
+                btn.textContent = '🔕 Alerts Blocked';
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+                btn.style.cursor = 'not-allowed';
+                status.classList.add('show');
+                status.innerHTML = `
+                    <strong>🔕 Notifications Blocked</strong><br>
+                    <span style="font-size: 0.9rem; color: #9a3412;">To enable: Go to browser settings → Site permissions → Notifications → Allow</span>
+                `;
+            } else {
+                btn.textContent = '🔔 Enable Alerts';
+                btn.classList.remove('enabled');
+            }
+        }
+        
+        // Toggle notifications
+        async function toggleNotifications() {
+            if (!('Notification' in window)) {
+                alert('Your browser does not support notifications');
+                return;
+            }
+            
+            if (notificationPermission === 'denied') {
+                alert('Notifications are blocked. Please enable them in your browser settings.');
+                return;
+            }
+            
+            if (notificationPermission === 'granted') {
+                // Already enabled, show info
+                alert('Severe weather alerts are enabled!\n\nYou will receive notifications when:\n• Severe weather warnings are issued\n• Dangerous conditions detected\n• Your saved locations are affected');
+                return;
+            }
+            
+            try {
+                // Request permission
+                const permission = await Notification.requestPermission();
+                notificationPermission = permission;
+                updateNotificationButton();
+                
+                if (permission === 'granted') {
+                    // Send test notification
+                    showNotification(
+                        'StormWarn Alerts Enabled ✅',
+                        'You\'ll now receive severe weather alerts for your area',
+                        '🔔'
+                    );
+                    
+                    // Subscribe to push notifications
+                    subscribeToPush();
+                }
+            } catch (error) {
+                console.error('Error requesting notification permission:', error);
+                alert('Failed to enable notifications. Please try again.');
+            }
+        }
+        
+        // Show notification
+        function showNotification(title, body, icon) {
+            if (notificationPermission !== 'granted') return;
+            
+            // Check if service worker is ready
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.ready.then((registration) => {
+                    registration.showNotification(title, {
+                        body: body,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%230ea5e9" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-size="60" font-weight="bold" fill="white" text-anchor="middle" dy=".3em"%3E' + icon + '%3C/text%3E%3C/svg%3E',
+                        badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Ccircle fill="%230ea5e9" cx="48" cy="48" r="48"/%3E%3Ctext x="50%25" y="50%25" font-size="48" font-weight="bold" fill="white" text-anchor="middle" dy=".3em"%3E⚠%3C/text%3E%3C/svg%3E',
+                        vibrate: [200, 100, 200],
+                        tag: 'stormwarn-alert',
+                        requireInteraction: true,
+                        data: {
+                            url: window.location.href
+                        }
+                    });
+                });
+            } else {
+                // Fallback to basic notification
+                new Notification(title, {
+                    body: body,
+                    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%230ea5e9" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" font-size="60" font-weight="bold" fill="white" text-anchor="middle" dy=".3em"%3E' + icon + '%3C/text%3E%3C/svg%3E'
+                });
+            }
+        }
+        
+        // Subscribe to push notifications (placeholder for backend integration)
+        async function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('Push notifications not supported');
+                return;
+            }
+            
+            try {
+                const registration = await navigator.serviceWorker.ready;
+                
+                // Check if already subscribed
+                const existingSubscription = await registration.pushManager.getSubscription();
+                if (existingSubscription) {
+                    console.log('Already subscribed to push notifications');
+                    // TODO: Send subscription to backend
+                    return;
+                }
+                
+                // Note: Push notifications require a backend server with VAPID keys
+                // For now, we'll use local notifications based on weather conditions
+                console.log('Push subscription ready - backend integration needed for production');
+                
+                // Store user preference
+                localStorage.setItem('stormwarn_notifications_enabled', 'true');
+                
+            } catch (error) {
+                console.error('Failed to subscribe to push:', error);
+            }
+        }
+        
+        // Check for severe weather and send notifications
+        function checkSevereWeather(warnings) {
+            if (notificationPermission !== 'granted') return;
+            if (!localStorage.getItem('stormwarn_notifications_enabled')) return;
+            
+            // Check if we already notified recently (don't spam)
+            const lastNotification = localStorage.getItem('stormwarn_last_notification');
+            const now = Date.now();
+            if (lastNotification && (now - parseInt(lastNotification)) < 3600000) {
+                // Less than 1 hour since last notification
+                return;
+            }
+            
+            // Filter for moderate to severe warnings (Level 4+)
+            const severeWarnings = warnings.filter(w => {
+                const level = parseInt(w.level.match(/\d+/)[0]);
+                return level >= 4;
+            });
+            
+            if (severeWarnings.length === 0) return;
+            
+            // Send notification for most severe warning
+            const mostSevere = severeWarnings[0];
+            const location = currentLocation ? currentLocation.name : 'your area';
+            
+            showNotification(
+                `⚠️ ${mostSevere.level} - ${location}`,
+                mostSevere.type + '\n' + mostSevere.message.substring(0, 100) + '...',
+                '⚠️'
+            );
+            
+            // Update last notification time
+            localStorage.setItem('stormwarn_last_notification', now.toString());
+        }
+        
+        // PWA Install functionality
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('StormWarn: PWA install prompt available');
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Store the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install button
+            const installBtn = document.getElementById('installBtn');
+            if (installBtn) {
+                installBtn.classList.add('show');
+            }
+        });
+        
+        // Function to install PWA
+        function installPWA() {
+            if (!deferredPrompt) {
+                console.log('StormWarn: Install prompt not available');
+                alert('To install:\n\niOS: Tap Share → Add to Home Screen\nAndroid: This app is already installable from your browser menu');
+                return;
+            }
+            
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('StormWarn: User accepted PWA install');
+                } else {
+                    console.log('StormWarn: User dismissed PWA install');
+                }
+                // Clear the deferredPrompt
+                deferredPrompt = null;
+                // Hide the install button
+                const installBtn = document.getElementById('installBtn');
+                if (installBtn) {
+                    installBtn.classList.remove('show');
+                }
+            });
+        }
+        
+        // Hide install button when app is installed
+        window.addEventListener('appinstalled', () => {
+            console.log('StormWarn: PWA installed successfully');
+            const installBtn = document.getElementById('installBtn');
+            if (installBtn) {
+                installBtn.classList.remove('show');
+            }
+            deferredPrompt = null;
+        });
+        
+        // Register service worker for offline capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Create service worker inline
+                const swCode = `
+                    const CACHE_NAME = 'stormwarn-v1';
+                    const urlsToCache = [
+                        '/',
+                        '/index.html'
+                    ];
+                    
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then((cache) => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then((response) => {
+                                    // Cache hit - return response
+                                    if (response) {
+                                        return response;
+                                    }
+                                    return fetch(event.request);
+                                })
+                        );
+                    });
+                    
+                    self.addEventListener('activate', (event) => {
+                        const cacheWhitelist = [CACHE_NAME];
+                        event.waitUntil(
+                            caches.keys().then((cacheNames) => {
+                                return Promise.all(
+                                    cacheNames.map((cacheName) => {
+                                        if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                            return caches.delete(cacheName);
+                                        }
+                                    })
+                                );
+                            })
+                        );
+                    });
+                    
+                    // Handle notification clicks
+                    self.addEventListener('notificationclick', (event) => {
+                        event.notification.close();
+                        
+                        // Open the app
+                        event.waitUntil(
+                            clients.matchAll({ type: 'window', includeUncontrolled: true })
+                                .then((clientList) => {
+                                    // Check if app is already open
+                                    for (let client of clientList) {
+                                        if (client.url === '/' && 'focus' in client) {
+                                            return client.focus();
+                                        }
+                                    }
+                                    // Open new window
+                                    if (clients.openWindow) {
+                                        return clients.openWindow('/');
+                                    }
+                                })
+                        );
+                    });
+                    
+                    // Handle push notifications (for future backend integration)
+                    self.addEventListener('push', (event) => {
+                        const data = event.data ? event.data.json() : {};
+                        const title = data.title || 'StormWarn Alert';
+                        const options = {
+                            body: data.body || 'Severe weather alert',
+                            icon: data.icon || '/icon-192.png',
+                            badge: '/badge-96.png',
+                            vibrate: [200, 100, 200],
+                            data: data,
+                            requireInteraction: true,
+                            tag: 'stormwarn-alert'
+                        };
+                        
+                        event.waitUntil(
+                            self.registration.showNotification(title, options)
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then((registration) => {
+                        console.log('StormWarn: Service Worker registered:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('StormWarn: Service Worker registration failed:', error);
+                    });
+            });
+        }
         
         // Load saved locations from localStorage
         function loadSavedLocations() {
@@ -984,6 +1434,9 @@
                 
                 // Generate warnings
                 const warnings = generateWarnings(current);
+                
+                // Check if we should send push notification for severe weather
+                checkSevereWeather(warnings);
                 
                 // Display warnings
                 let warningsHTML = '';
