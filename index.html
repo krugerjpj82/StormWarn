@@ -71,6 +71,31 @@
             font-weight: 700;
         }
         
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                flex-wrap: wrap;
+            }
+            
+            .header-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .install-btn, .notifications-btn {
+                flex: 1;
+                min-width: 0;
+                font-size: 0.85rem;
+                padding: 0.6rem 0.8rem;
+                white-space: nowrap;
+            }
+        }
+        
         .card {
             background: white;
             border-radius: 12px;
@@ -404,6 +429,29 @@
             margin-top: 1.5rem;
             padding-top: 1.5rem;
             border-top: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .hourly-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #8b5cf6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        
+        .hourly-btn:hover {
+            background: #7c3aed;
         }
         
         .warnings-card {
@@ -570,13 +618,478 @@
                 font-size: 3rem;
             }
         }
+        
+        .hourly-forecast {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #0ea5e9;
+        }
+        
+        .hourly-forecast.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+        
+        .hourly-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #0ea5e9;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .hourly-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .hourly-item {
+            display: grid;
+            grid-template-columns: 80px 50px 1fr 80px 80px;
+            gap: 1rem;
+            align-items: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .hourly-item.current {
+            background: #e0f2fe;
+            border: 2px solid #0ea5e9;
+            font-weight: 600;
+        }
+        
+        .hourly-time {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .hourly-icon {
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .hourly-condition {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .hourly-temp {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .hourly-details {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .forecast-day.today {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .forecast-day.today:hover {
+            background: #dbeafe;
+        }
+        
+        .expand-icon {
+            margin-left: auto;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        @media (max-width: 768px) {
+            .hourly-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .hourly-icon {
+                font-size: 2rem;
+            }
+        }
+        
+        .radar-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .radar-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .radar-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .radar-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e5e7eb;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .radar-btn:hover {
+            border-color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        
+        .radar-btn.active {
+            background: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+        }
+        
+        .radar-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+        
+        .radar-map {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
+        
+        .radar-legend {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-size: 0.85rem;
+        }
+        
+        .radar-legend-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .radar-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .radar-legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+        
+        .radar-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f0f9ff;
+            border-left: 4px solid #0ea5e9;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .radar-container {
+                height: 400px;
+            }
+            
+            .radar-legend {
+                bottom: 5px;
+                right: 5px;
+                font-size: 0.75rem;
+                padding: 0.5rem;
+            }
+            
+            .radar-controls {
+                flex-direction: column;
+            }
+            
+            .radar-btn {
+                width: 100%;
+            }
+        }
+        
+        /* Modal Popup Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            z-index: 9999;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-close {
+            background: #f0f0f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: #e0e0e0;
+            transform: scale(1.1);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-hourly-list {
+            display: grid;
+            gap: 0.75rem;
+        }
+        
+        .modal-hourly-item {
+            display: grid;
+            grid-template-columns: 100px 60px 1fr 100px 120px;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+        
+        .modal-hourly-item:hover {
+            background: #e9ecef;
+        }
+        
+        .modal-hourly-item.current {
+            background: #e0f2fe;
+            border: 2px solid #0ea5e9;
+            font-weight: 600;
+        }
+        
+        .modal-hour-time {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1a1a1a;
+        }
+        
+        .modal-hour-icon {
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .modal-hour-condition {
+            color: #666;
+        }
+        
+        .modal-hour-temp {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1a1a1a;
+        }
+        
+        .modal-hour-details {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            display: none;
+            animation: slideUpNotif 0.3s ease;
+        }
+        
+        .offline-indicator.show {
+            display: block;
+        }
+        
+        .offline-indicator.online {
+            background: #10b981;
+        }
+        
+        @keyframes slideUpNotif {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .cache-status {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .cache-status.hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                max-height: 85vh;
+                margin: 1rem;
+            }
+            
+            .modal-title {
+                font-size: 1.2rem;
+            }
+            
+            .modal-hourly-item {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .modal-hour-icon {
+                font-size: 2.5rem;
+            }
+            
+            .modal-hour-time {
+                font-size: 1rem;
+            }
+            
+            .modal-hour-temp {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="logo">⚠️ StormWarn</div>
-            <div style="display: flex; gap: 0.5rem;">
+            <div class="header-buttons">
                 <button class="install-btn" id="installBtn" onclick="installPWA()">
                     📱 Add to Home Screen
                 </button>
@@ -617,6 +1130,11 @@
         </div>
     </div>
     
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📡 Offline - Using cached data
+    </div>
+    
     <script>
         console.log('StormWarn: App starting...');
         
@@ -626,18 +1144,145 @@
         const saveBtn = document.getElementById('saveBtn');
         const savedLocationsContainer = document.getElementById('savedLocationsContainer');
         const savedLocationsDiv = document.getElementById('savedLocations');
+        const offlineIndicator = document.getElementById('offlineIndicator');
         
         let currentLocation = null;
         let savedLocations = [];
         let searchTimeout = null;
         let deferredPrompt = null;
         let notificationPermission = 'default';
+        let currentRadarLayer = 'precipitation';
+        
+        // Network status monitoring
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                offlineIndicator.textContent = '✅ Back online - Refreshing data';
+                offlineIndicator.classList.add('online');
+                offlineIndicator.classList.add('show');
+                
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    offlineIndicator.classList.remove('show');
+                    setTimeout(() => {
+                        offlineIndicator.classList.remove('online');
+                    }, 300);
+                }, 3000);
+                
+                // Refresh weather if we have current location
+                if (currentLocation) {
+                    console.log('StormWarn: Back online, refreshing weather data');
+                    loadWeather(currentLocation.lat, currentLocation.lon, currentLocation.name);
+                }
+            } else {
+                offlineIndicator.textContent = '📡 Offline - Using cached data (valid 24 hours)';
+                offlineIndicator.classList.remove('online');
+                offlineIndicator.classList.add('show');
+                console.log('StormWarn: Offline mode - cached data will be used');
+            }
+        }
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        
+        // Check initial status
+        if (!navigator.onLine) {
+            updateOnlineStatus();
+        }
+        
+        // Switch radar layer
+        function switchRadarLayer(layer) {
+            currentRadarLayer = layer;
+            
+            // Update button states
+            document.querySelectorAll('.radar-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update radar map
+            updateRadarMap();
+        }
+        
+        // Update radar map with current layer and location
+        function updateRadarMap() {
+            if (!currentLocation) return;
+            
+            const radarFrame = document.getElementById('radarMap');
+            if (!radarFrame) return;
+            
+            const { lat, lon } = currentLocation;
+            const zoom = 8; // Good zoom level for regional view
+            
+            // Map our layer names to Windy overlay names
+            const layerMap = {
+                'rain': 'rain',
+                'clouds': 'clouds',
+                'wind': 'wind',
+                'temp': 'temp',
+                'lightning': 'lightning'
+            };
+            
+            const windyLayer = layerMap[currentRadarLayer] || 'rain';
+            
+            // Build Windy embed URL with specific layer
+            let windyUrl = `https://embed.windy.com/embed2.html?lat=${lat}&lon=${lon}&detailLat=${lat}&detailLon=${lon}&width=100%&height=500&zoom=${zoom}&level=surface&overlay=${windyLayer}&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+            
+            radarFrame.src = windyUrl;
+        }
+        
+        // Detect if user is on iOS
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+        
+        // Detect if user is on Android
+        function isAndroid() {
+            return /Android/.test(navigator.userAgent);
+        }
+        
+        // Check if running as installed PWA
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone || 
+                   document.referrer.includes('android-app://');
+        }
+        
+        // Show install button based on platform
+        function showInstallButton() {
+            const installBtn = document.getElementById('installBtn');
+            
+            // Don't show if already installed
+            if (isStandalone()) {
+                console.log('StormWarn: Already running as installed app');
+                return;
+            }
+            
+            // For iOS - always show with manual instructions
+            if (isIOS()) {
+                installBtn.textContent = '📱 Install App';
+                installBtn.classList.add('show');
+                console.log('StormWarn: iOS detected - showing install button');
+                return;
+            }
+            
+            // For Android/Desktop - show if prompt available
+            if (deferredPrompt) {
+                installBtn.classList.add('show');
+                console.log('StormWarn: Install prompt available - showing button');
+            }
+        }
         
         // Check notification permission on load
         if ('Notification' in window) {
             notificationPermission = Notification.permission;
             updateNotificationButton();
         }
+        
+        // Check if install button should be shown
+        setTimeout(() => {
+            showInstallButton();
+        }, 1000); // Small delay to ensure DOM is ready
         
         // Update notification button state
         function updateNotificationButton() {
@@ -817,17 +1462,36 @@
             // Store the event so it can be triggered later
             deferredPrompt = e;
             // Show the install button
-            const installBtn = document.getElementById('installBtn');
-            if (installBtn) {
-                installBtn.classList.add('show');
-            }
+            showInstallButton();
         });
         
         // Function to install PWA
         function installPWA() {
+            // iOS-specific instructions
+            if (isIOS()) {
+                const message = isStandalone() 
+                    ? 'App is already installed on your home screen!'
+                    : 'To install StormWarn on iOS:\n\n' +
+                      '1. Tap the Share button (⬆️)\n' +
+                      '2. Scroll down\n' +
+                      '3. Tap "Add to Home Screen"\n' +
+                      '4. Tap "Add"\n\n' +
+                      'You\'ll then have instant access to weather alerts!';
+                
+                alert(message);
+                return;
+            }
+            
+            // Android/Desktop - use native prompt
             if (!deferredPrompt) {
                 console.log('StormWarn: Install prompt not available');
-                alert('To install:\n\niOS: Tap Share → Add to Home Screen\nAndroid: This app is already installable from your browser menu');
+                
+                // Fallback instructions for browsers that don't support beforeinstallprompt
+                if (isAndroid()) {
+                    alert('To install StormWarn:\n\n1. Tap the menu (⋮) in your browser\n2. Tap "Add to Home screen" or "Install app"\n3. Tap "Add" or "Install"');
+                } else {
+                    alert('To install StormWarn:\n\n1. Click the install icon in your browser address bar\n2. Or check your browser menu for "Install" option');
+                }
                 return;
             }
             
@@ -861,51 +1525,305 @@
             deferredPrompt = null;
         });
         
-        // Register service worker for offline capability
+        // Register service worker for offline capability and 24-hour access
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                // Create service worker inline
+                // Create enhanced service worker inline
                 const swCode = `
-                    const CACHE_NAME = 'stormwarn-v1';
+                    const CACHE_NAME = 'stormwarn-v2.0';
+                    const RUNTIME_CACHE = 'stormwarn-runtime';
+                    const API_CACHE = 'stormwarn-api';
+                    const RADAR_CACHE = 'stormwarn-radar';
+                    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+                    const RADAR_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours for radar
+                    
+                    // URLs to cache immediately on install
                     const urlsToCache = [
                         '/',
                         '/index.html'
                     ];
                     
+                    // Windy radar assets to pre-cache
+                    const radarAssets = [
+                        'https://embed.windy.com/embed2.html',
+                        'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'
+                    ];
+                    
+                    // Install event - cache core files
                     self.addEventListener('install', (event) => {
+                        console.log('[SW] Installing service worker v2.0 with radar caching...');
                         event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then((cache) => cache.addAll(urlsToCache))
-                        );
-                    });
-                    
-                    self.addEventListener('fetch', (event) => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then((response) => {
-                                    // Cache hit - return response
-                                    if (response) {
-                                        return response;
-                                    }
-                                    return fetch(event.request);
+                            Promise.all([
+                                caches.open(CACHE_NAME).then((cache) => {
+                                    console.log('[SW] Caching core files');
+                                    return cache.addAll(urlsToCache);
+                                }),
+                                caches.open(RADAR_CACHE).then((cache) => {
+                                    console.log('[SW] Pre-caching radar assets');
+                                    return Promise.allSettled(
+                                        radarAssets.map(url => 
+                                            fetch(url, { mode: 'no-cors' })
+                                                .then(response => cache.put(url, response))
+                                                .catch(err => console.log('[SW] Failed to cache:', url))
+                                        )
+                                    );
                                 })
+                            ]).then(() => self.skipWaiting())
                         );
                     });
                     
+                    // Activate event - clean up old caches
                     self.addEventListener('activate', (event) => {
-                        const cacheWhitelist = [CACHE_NAME];
+                        console.log('[SW] Activating service worker...');
+                        const cacheWhitelist = [CACHE_NAME, RUNTIME_CACHE, API_CACHE, RADAR_CACHE];
                         event.waitUntil(
                             caches.keys().then((cacheNames) => {
                                 return Promise.all(
                                     cacheNames.map((cacheName) => {
-                                        if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                        if (!cacheWhitelist.includes(cacheName)) {
+                                            console.log('[SW] Deleting old cache:', cacheName);
                                             return caches.delete(cacheName);
                                         }
                                     })
                                 );
-                            })
+                            }).then(() => self.clients.claim())
                         );
                     });
+                    
+                    // Fetch event - serve from cache with network fallback
+                    self.addEventListener('fetch', (event) => {
+                        const { request } = event;
+                        const url = new URL(request.url);
+                        
+                        // Handle API requests specially (weather data)
+                        if (url.hostname === 'api.open-meteo.com' || 
+                            url.hostname === 'api.bigdatacloud.net' ||
+                            url.hostname === 'geocoding-api.open-meteo.com') {
+                            event.respondWith(handleAPIRequest(request));
+                            return;
+                        }
+                        
+                        // Handle Windy radar iframe and assets
+                        if (url.hostname === 'embed.windy.com' || 
+                            url.hostname.includes('windy.com') ||
+                            url.hostname.includes('windycdn') ||
+                            (url.hostname.includes('cloudflare') && url.pathname.includes('three.js'))) {
+                            event.respondWith(handleRadarRequest(request));
+                            return;
+                        }
+                        
+                        // Handle app shell (HTML, CSS, JS)
+                        event.respondWith(handleAppShellRequest(request));
+                    });
+                    
+                    // Handle app shell with cache-first strategy
+                    async function handleAppShellRequest(request) {
+                        try {
+                            // Try cache first
+                            const cachedResponse = await caches.match(request);
+                            if (cachedResponse) {
+                                console.log('[SW] Serving from cache:', request.url);
+                                return cachedResponse;
+                            }
+                            
+                            // Network fallback
+                            console.log('[SW] Fetching from network:', request.url);
+                            const networkResponse = await fetch(request);
+                            
+                            // Cache the new response
+                            if (networkResponse && networkResponse.status === 200) {
+                                const cache = await caches.open(RUNTIME_CACHE);
+                                cache.put(request, networkResponse.clone());
+                            }
+                            
+                            return networkResponse;
+                        } catch (error) {
+                            console.log('[SW] Fetch failed, serving from cache:', error);
+                            
+                            // Try to serve from cache as last resort
+                            const cachedResponse = await caches.match(request);
+                            if (cachedResponse) {
+                                return cachedResponse;
+                            }
+                            
+                            // Return offline page if available
+                            return new Response('Offline - Please check your connection', {
+                                status: 503,
+                                statusText: 'Service Unavailable'
+                            });
+                        }
+                    }
+                    
+                    // Handle API requests with network-first, cache fallback (24-hour expiry)
+                    async function handleAPIRequest(request) {
+                        try {
+                            // Try network first for fresh data
+                            console.log('[SW] Fetching API data from network:', request.url);
+                            const networkResponse = await fetch(request);
+                            
+                            if (networkResponse && networkResponse.status === 200) {
+                                // Clone and cache the response with timestamp
+                                const cache = await caches.open(API_CACHE);
+                                const responseToCache = networkResponse.clone();
+                                
+                                // Add timestamp header
+                                const headers = new Headers(responseToCache.headers);
+                                headers.append('sw-cache-time', Date.now().toString());
+                                
+                                const cachedResponse = new Response(responseToCache.body, {
+                                    status: responseToCache.status,
+                                    statusText: responseToCache.statusText,
+                                    headers: headers
+                                });
+                                
+                                await cache.put(request, cachedResponse);
+                                console.log('[SW] Cached API response:', request.url);
+                            }
+                            
+                            return networkResponse;
+                        } catch (error) {
+                            console.log('[SW] Network failed, checking cache:', error);
+                            
+                            // Network failed, try cache
+                            const cachedResponse = await caches.match(request);
+                            
+                            if (cachedResponse) {
+                                // Check if cache is still valid (within 24 hours)
+                                const cacheTime = cachedResponse.headers.get('sw-cache-time');
+                                const now = Date.now();
+                                
+                                if (cacheTime && (now - parseInt(cacheTime)) < CACHE_DURATION) {
+                                    console.log('[SW] Serving valid cached API data:', request.url);
+                                    return cachedResponse;
+                                } else {
+                                    console.log('[SW] Cache expired for:', request.url);
+                                    // Still serve expired cache if offline
+                                    return cachedResponse;
+                                }
+                            }
+                            
+                            // No cache available
+                            console.log('[SW] No cache available for:', request.url);
+                            return new Response(JSON.stringify({
+                                error: 'offline',
+                                message: 'No internet connection and no cached data available'
+                            }), {
+                                status: 503,
+                                headers: { 'Content-Type': 'application/json' }
+                            });
+                        }
+                    }
+                    
+                    // Handle Windy radar with intelligent caching (24-hour cache)
+                    async function handleRadarRequest(request) {
+                        const url = new URL(request.url);
+                        
+                        try {
+                            // Try network first for live radar
+                            console.log('[SW] Fetching radar from network:', request.url);
+                            const networkResponse = await fetch(request);
+                            
+                            if (networkResponse && networkResponse.status === 200) {
+                                // Cache radar assets and tiles
+                                const cache = await caches.open(RADAR_CACHE);
+                                const responseToCache = networkResponse.clone();
+                                
+                                // Add timestamp for radar data
+                                const headers = new Headers(responseToCache.headers);
+                                headers.append('sw-radar-cache-time', Date.now().toString());
+                                
+                                const cachedResponse = new Response(responseToCache.body, {
+                                    status: responseToCache.status,
+                                    statusText: responseToCache.statusText,
+                                    headers: headers
+                                });
+                                
+                                await cache.put(request, cachedResponse);
+                                console.log('[SW] Cached radar asset:', request.url);
+                            }
+                            
+                            return networkResponse;
+                        } catch (error) {
+                            console.log('[SW] Radar network failed, checking cache:', error);
+                            
+                            // Network failed, try cache
+                            const cachedResponse = await caches.match(request);
+                            
+                            if (cachedResponse) {
+                                // Check cache age
+                                const cacheTime = cachedResponse.headers.get('sw-radar-cache-time');
+                                const now = Date.now();
+                                
+                                if (cacheTime && (now - parseInt(cacheTime)) < RADAR_CACHE_DURATION) {
+                                    console.log('[SW] Serving cached radar (valid):', request.url);
+                                } else {
+                                    console.log('[SW] Serving cached radar (expired but offline):', request.url);
+                                }
+                                
+                                return cachedResponse;
+                            }
+                            
+                            // No cache, return offline placeholder for iframe
+                            if (url.pathname.includes('embed2.html')) {
+                                console.log('[SW] No radar cache, returning offline message');
+                                return new Response(\`
+                                    <!DOCTYPE html>
+                                    <html>
+                                    <head>
+                                        <meta charset="UTF-8">
+                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                        <style>
+                                            body {
+                                                margin: 0;
+                                                font-family: Arial, sans-serif;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                height: 100vh;
+                                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                color: white;
+                                            }
+                                            .offline-message {
+                                                text-align: center;
+                                                padding: 2rem;
+                                            }
+                                            .offline-icon {
+                                                font-size: 4rem;
+                                                margin-bottom: 1rem;
+                                            }
+                                            h2 {
+                                                margin: 0 0 1rem 0;
+                                                font-size: 1.5rem;
+                                            }
+                                            p {
+                                                margin: 0;
+                                                opacity: 0.9;
+                                                font-size: 1rem;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        <div class="offline-message">
+                                            <div class="offline-icon">🌐</div>
+                                            <h2>Radar Offline</h2>
+                                            <p>Live radar requires internet connection</p>
+                                            <p style="margin-top: 1rem; font-size: 0.9rem;">Other weather data available from cache</p>
+                                        </div>
+                                    </body>
+                                    </html>
+                                \`, {
+                                    status: 200,
+                                    headers: { 'Content-Type': 'text/html' }
+                                });
+                            }
+                            
+                            // For other radar assets, return error
+                            return new Response('Radar asset unavailable offline', {
+                                status: 503,
+                                headers: { 'Content-Type': 'text/plain' }
+                            });
+                        }
+                    }
                     
                     // Handle notification clicks
                     self.addEventListener('notificationclick', (event) => {
@@ -932,7 +1850,7 @@
                     // Handle push notifications (for future backend integration)
                     self.addEventListener('push', (event) => {
                         const data = event.data ? event.data.json() : {};
-                        const title = data.title || 'StormWarn Alert';
+                        const title = data.title || '⚠️ StormWarn Alert';
                         const options = {
                             body: data.body || 'Severe weather alert',
                             icon: data.icon || '/icon-192.png',
@@ -940,13 +1858,82 @@
                             vibrate: [200, 100, 200],
                             data: data,
                             requireInteraction: true,
-                            tag: 'stormwarn-alert'
+                            tag: 'stormwarn-alert',
+                            actions: [
+                                { action: 'view', title: 'View Details' },
+                                { action: 'dismiss', title: 'Dismiss' }
+                            ]
                         };
                         
                         event.waitUntil(
                             self.registration.showNotification(title, options)
                         );
                     });
+                    
+                    // Background sync for offline actions
+                    self.addEventListener('sync', (event) => {
+                        console.log('[SW] Background sync triggered:', event.tag);
+                        if (event.tag === 'sync-weather-data') {
+                            event.waitUntil(syncWeatherData());
+                        } else if (event.tag === 'sync-radar-data') {
+                            event.waitUntil(syncRadarData());
+                        }
+                    });
+                    
+                    // Sync weather data when back online
+                    async function syncWeatherData() {
+                        console.log('[SW] Syncing weather data...');
+                        const cache = await caches.open(API_CACHE);
+                        const keys = await cache.keys();
+                        
+                        // Remove entries older than 24 hours
+                        const now = Date.now();
+                        for (const request of keys) {
+                            const response = await cache.match(request);
+                            const cacheTime = response.headers.get('sw-cache-time');
+                            
+                            if (cacheTime && (now - parseInt(cacheTime)) > CACHE_DURATION) {
+                                await cache.delete(request);
+                                console.log('[SW] Removed expired weather cache entry');
+                            }
+                        }
+                    }
+                    
+                    // Sync radar data when back online
+                    async function syncRadarData() {
+                        console.log('[SW] Syncing radar data...');
+                        const cache = await caches.open(RADAR_CACHE);
+                        const keys = await cache.keys();
+                        
+                        // Remove entries older than 24 hours
+                        const now = Date.now();
+                        let cleaned = 0;
+                        
+                        for (const request of keys) {
+                            const response = await cache.match(request);
+                            const cacheTime = response.headers.get('sw-radar-cache-time');
+                            
+                            if (cacheTime && (now - parseInt(cacheTime)) > RADAR_CACHE_DURATION) {
+                                await cache.delete(request);
+                                cleaned++;
+                            }
+                        }
+                        
+                        console.log(\`[SW] Cleaned \${cleaned} expired radar cache entries\`);
+                    }
+                    
+                    // Periodic background sync (Chrome only, future feature)
+                    self.addEventListener('periodicsync', (event) => {
+                        if (event.tag === 'update-weather') {
+                            console.log('[SW] Periodic sync: updating weather');
+                            event.waitUntil(syncWeatherData());
+                        } else if (event.tag === 'update-radar') {
+                            console.log('[SW] Periodic sync: updating radar');
+                            event.waitUntil(syncRadarData());
+                        }
+                    });
+                    
+                    console.log('[SW] Service Worker v2.0 loaded with radar caching enabled');
                 `;
                 
                 const blob = new Blob([swCode], { type: 'application/javascript' });
@@ -954,10 +1941,21 @@
                 
                 navigator.serviceWorker.register(swUrl)
                     .then((registration) => {
-                        console.log('StormWarn: Service Worker registered:', registration);
+                        console.log('StormWarn: Service Worker registered successfully');
+                        console.log('StormWarn: Offline mode enabled - 24-hour weather + radar caching active');
+                        
+                        // Check for updates every hour
+                        setInterval(() => {
+                            registration.update();
+                        }, 60 * 60 * 1000);
+                        
+                        // Trigger initial radar cache if online
+                        if (navigator.onLine) {
+                            console.log('StormWarn: Pre-caching radar assets...');
+                        }
                     })
                     .catch((error) => {
-                        console.log('StormWarn: Service Worker registration failed:', error);
+                        console.error('StormWarn: Service Worker registration failed:', error);
                     });
             });
         }
@@ -1110,6 +2108,47 @@
             }
         });
         
+        // Toggle hourly forecast display
+        function toggleHourlyForecast() {
+            const hourlyDiv = document.getElementById('hourlyForecast');
+            const expandIcon = document.getElementById('expandIcon');
+            
+            if (hourlyDiv.classList.contains('show')) {
+                hourlyDiv.classList.remove('show');
+                expandIcon.classList.remove('expanded');
+            } else {
+                hourlyDiv.classList.add('show');
+                expandIcon.classList.add('expanded');
+            }
+        }
+        
+        // Show 24-hour forecast in modal popup
+        function show24HourForecast() {
+            const modal = document.getElementById('hourlyModal');
+            if (modal) {
+                modal.classList.add('show');
+                // Prevent body scroll when modal is open
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Close 24-hour forecast modal
+        function closeHourlyModal() {
+            const modal = document.getElementById('hourlyModal');
+            if (modal) {
+                modal.classList.remove('show');
+                // Restore body scroll
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Close modal when clicking outside
+        function handleModalClick(event) {
+            if (event.target.id === 'hourlyModal') {
+                closeHourlyModal();
+            }
+        }
+        
         // Get weather description from code
         function getWeatherDescription(code) {
             const descriptions = {
@@ -1156,6 +2195,74 @@
         function getWindDirection(degrees) {
             const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
             return dirs[Math.round(degrees / 22.5) % 16];
+        }
+        
+        // Calculate moon phase from date
+        function getMoonPhase(date = new Date()) {
+            // Calculate days since known new moon (Jan 6, 2000)
+            const referenceDate = new Date(2000, 0, 6, 18, 14);
+            const daysSince = (date - referenceDate) / (1000 * 60 * 60 * 24);
+            
+            // Moon cycle is 29.53 days
+            const lunarCycle = 29.53058867;
+            const phase = (daysSince % lunarCycle) / lunarCycle;
+            
+            return phase;
+        }
+        
+        // Get moon phase name and emoji
+        function getMoonPhaseInfo(phase) {
+            if (phase < 0.03 || phase > 0.97) {
+                return { name: 'New Moon', emoji: '🌑', illumination: 0 };
+            } else if (phase < 0.22) {
+                return { name: 'Waxing Crescent', emoji: '🌒', illumination: Math.round(phase * 100) };
+            } else if (phase < 0.28) {
+                return { name: 'First Quarter', emoji: '🌓', illumination: 50 };
+            } else if (phase < 0.47) {
+                return { name: 'Waxing Gibbous', emoji: '🌔', illumination: Math.round(phase * 100) };
+            } else if (phase < 0.53) {
+                return { name: 'Full Moon', emoji: '🌕', illumination: 100 };
+            } else if (phase < 0.72) {
+                return { name: 'Waning Gibbous', emoji: '🌖', illumination: Math.round((1 - phase) * 100) };
+            } else if (phase < 0.78) {
+                return { name: 'Last Quarter', emoji: '🌗', illumination: 50 };
+            } else {
+                return { name: 'Waning Crescent', emoji: '🌘', illumination: Math.round((1 - phase) * 100) };
+            }
+        }
+        
+        // Format time from ISO string
+        function formatTime(isoString) {
+            if (!isoString) return 'N/A';
+            const date = new Date(isoString);
+            const hours = date.getHours();
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            return `${displayHours}:${minutes} ${ampm}`;
+        }
+        
+        // Calculate moonrise and moonset (approximate)
+        function calculateMoonTimes(date, latitude, longitude) {
+            const phase = getMoonPhase(date);
+            
+            // Simplified calculation based on moon phase
+            // Full moon rises around sunset, new moon rises around sunrise
+            const dayOffset = phase * 24; // Hours offset from sunrise
+            
+            const moonriseHour = (6 + dayOffset) % 24; // Approximate moonrise
+            const moonsetHour = (moonriseHour + 12) % 24; // Approximate moonset
+            
+            const moonrise = new Date(date);
+            moonrise.setHours(Math.floor(moonriseHour), Math.floor((moonriseHour % 1) * 60), 0);
+            
+            const moonset = new Date(date);
+            moonset.setHours(Math.floor(moonsetHour), Math.floor((moonsetHour % 1) * 60), 0);
+            
+            return {
+                moonrise: moonrise.toISOString(),
+                moonset: moonset.toISOString()
+            };
         }
         
         // Generate detailed weather warnings based on conditions
@@ -1264,22 +2371,22 @@
                     warnings.push({
                         level: 'Level 9 (Orange)',
                         color: 'warning-red',
-                        type: 'Severe Thunderstorm - EXTREME',
-                        message: 'Violent thunderstorms with very large hail. Severe damage to property and crops. Life-threatening lightning. Seek substantial shelter immediately.'
+                        type: '⚡ Severe Thunderstorm - EXTREME',
+                        message: 'Violent thunderstorms with very large hail. LIFE-THREATENING LIGHTNING. Severe damage to property and crops. Seek substantial shelter immediately. Check ⚡Lightning radar layer for real-time strike locations.'
                     });
                 } else if (current.weather_code === 96) {
                     warnings.push({
                         level: 'Level 7 (Orange)',
                         color: 'warning-orange',
-                        type: 'Severe Thunderstorm with Hail',
-                        message: 'Severe thunderstorms with large hail. Damage to vehicles and structures. Dangerous lightning. Take shelter now.'
+                        type: '⚡ Severe Thunderstorm with Hail',
+                        message: 'Severe thunderstorms with large hail. DANGEROUS LIGHTNING activity. Damage to vehicles and structures. Take shelter now. Monitor ⚡Lightning radar for active strikes.'
                     });
                 } else {
                     warnings.push({
                         level: 'Level 6 (Yellow)',
                         color: 'warning-yellow',
-                        type: 'Severe Thunderstorm Warning',
-                        message: 'Severe thunderstorms approaching. Lightning, heavy rain, possible hail and strong winds. Move indoors away from windows.'
+                        type: '⚡ Severe Thunderstorm Warning',
+                        message: 'Severe thunderstorms approaching. Active lightning, heavy rain, possible hail and strong winds. Move indoors away from windows. View ⚡Lightning radar layer to track storm cells.'
                     });
                 }
             } else if (current.weather_code === 82) {
@@ -1403,29 +2510,50 @@
                 // Get location name
                 if (customName) {
                     locationName = customName;
+                    console.log('StormWarn: Using custom location name:', locationName);
                 } else {
-                    const geoRes = await fetch(
-                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
-                    );
-                    const geoData = await geoRes.json();
-                    locationName = `${geoData.city || 'Unknown'}, ${geoData.principalSubdivision || ''}`;
+                    try {
+                        console.log('StormWarn: Fetching location name from BigDataCloud...');
+                        const geoRes = await fetch(
+                            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+                        );
+                        if (!geoRes.ok) {
+                            throw new Error(`Geocoding failed: ${geoRes.status}`);
+                        }
+                        const geoData = await geoRes.json();
+                        locationName = `${geoData.city || geoData.locality || 'Unknown'}, ${geoData.principalSubdivision || geoData.countryName || ''}`;
+                        console.log('StormWarn: Location name retrieved:', locationName);
+                    } catch (geoError) {
+                        console.warn('StormWarn: Geocoding failed, using coordinates:', geoError);
+                        locationName = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+                    }
                 }
                 
                 // Get weather data
+                console.log('StormWarn: Fetching weather data from Open-Meteo...');
                 const weatherRes = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl&hourly=precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=auto&forecast_days=14`
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,pressure_msl&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max,sunrise,sunset,daylight_duration,sunshine_duration&timezone=auto&forecast_days=14`
                 );
                 
                 if (!weatherRes.ok) {
-                    throw new Error(`Weather API error: ${weatherRes.status}`);
+                    throw new Error(`Weather API returned status ${weatherRes.status}: ${weatherRes.statusText}`);
                 }
                 
+                console.log('StormWarn: Parsing weather response...');
                 const weather = await weatherRes.json();
+                
+                if (!weather || !weather.current) {
+                    throw new Error('Invalid weather data received from API');
+                }
+                
                 const current = weather.current;
+                console.log('StormWarn: Current weather data:', current);
                 
                 // Get current hour's precipitation probability
                 const currentHour = new Date().getHours();
-                const precipProb = weather.hourly.precipitation_probability[currentHour] || 0;
+                const precipProb = weather.hourly && weather.hourly.precipitation_probability 
+                    ? weather.hourly.precipitation_probability[currentHour] || 0 
+                    : 0;
                 
                 // Store current location and weather data
                 currentLocation = { lat, lon, name: locationName, weather: current, precipProb };
@@ -1465,6 +2593,15 @@
                     `;
                 }
                 
+                // Calculate moon phase and times
+                const moonPhase = getMoonPhase(new Date());
+                const moonInfo = getMoonPhaseInfo(moonPhase);
+                const moonTimes = calculateMoonTimes(new Date(), lat, lon);
+                
+                // Get today's sunrise/sunset from daily data
+                const todaySunrise = weather.daily && weather.daily.sunrise ? weather.daily.sunrise[0] : null;
+                const todaySunset = weather.daily && weather.daily.sunset ? weather.daily.sunset[0] : null;
+                
                 // Display weather
                 app.innerHTML = warningsHTML + `
                     <div class="card">
@@ -1500,6 +2637,29 @@
                             </div>
                         </div>
                         
+                        <div class="details" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f0f0f0;">
+                            <div class="detail">
+                                <div class="detail-label">☀️ Sunrise</div>
+                                <div class="detail-value">${formatTime(todaySunrise)}</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">🌅 Sunset</div>
+                                <div class="detail-value">${formatTime(todaySunset)}</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">🌙 Moonrise</div>
+                                <div class="detail-value">${formatTime(moonTimes.moonrise)}</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">🌙 Moonset</div>
+                                <div class="detail-value">${formatTime(moonTimes.moonset)}</div>
+                            </div>
+                            <div class="detail">
+                                <div class="detail-label">${moonInfo.emoji} Moon Phase</div>
+                                <div class="detail-value">${moonInfo.name}</div>
+                            </div>
+                        </div>
+                        
                         <div class="share-section">
                             <button class="share-btn" onclick="shareWeather()">
                                 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1507,14 +2667,66 @@
                                 </svg>
                                 Share via WhatsApp
                             </button>
+                            <button class="hourly-btn" onclick="show24HourForecast()">
+                                🕐 View 24-Hour Forecast
+                            </button>
                         </div>
                     </div>
                 `;
                 
-                // Add 10-day forecast
+                // Add radar map section IMMEDIATELY after current weather
+                const radarHTML = `
+                    <div class="radar-card">
+                        <div class="radar-header">
+                            🌧️ Live Weather Radar
+                        </div>
+                        
+                        <div class="radar-controls">
+                            <button class="radar-btn active" onclick="switchRadarLayer('rain')">
+                                💧 Precipitation
+                            </button>
+                            <button class="radar-btn" onclick="switchRadarLayer('clouds')">
+                                ☁️ Clouds
+                            </button>
+                            <button class="radar-btn" onclick="switchRadarLayer('wind')">
+                                💨 Wind
+                            </button>
+                            <button class="radar-btn" onclick="switchRadarLayer('temp')">
+                                🌡️ Temperature
+                            </button>
+                            <button class="radar-btn" onclick="switchRadarLayer('lightning')">
+                                ⚡ Lightning
+                            </button>
+                        </div>
+                        
+                        <div class="radar-container">
+                            <iframe 
+                                id="radarMap"
+                                class="radar-map"
+                                frameborder="0"
+                                loading="lazy"
+                                allow="geolocation"
+                            ></iframe>
+                        </div>
+                        
+                        <div class="radar-info">
+                            ℹ️ Live weather radar powered by Windy. View precipitation, clouds, wind, temperature, and real-time lightning strikes. Drag to pan, scroll to zoom. Data updates every 10 minutes.
+                        </div>
+                    </div>
+                `;
+                
+                app.innerHTML += radarHTML;
+                
+                // Initialize radar
+                updateRadarMap();
+                
+                // Add 10-day forecast AT THE BOTTOM
                 const daily = weather.daily;
-                if (daily && daily.time) {
+                const hourly = weather.hourly;
+                
+                if (daily && daily.time && hourly && hourly.time) {
                     const forecastDays = daily.time.slice(0, 10); // Get first 10 days
+                    const currentHour = new Date().getHours();
                     
                     const forecastHTML = `
                         <div class="forecast-card">
@@ -1533,14 +2745,17 @@
                                     const precipProb = daily.precipitation_probability_max ? daily.precipitation_probability_max[index] : 0;
                                     const windMax = daily.wind_speed_10m_max ? Math.round(daily.wind_speed_10m_max[index]) : 0;
                                     
-                                    return `
-                                        <div class="forecast-day ${isToday ? 'today' : ''}">
+                                    let dayHTML = `
+                                        <div class="forecast-day ${isToday ? 'today' : ''}" ${isToday ? 'onclick="toggleHourlyForecast()"' : ''}>
                                             <div class="forecast-date">
                                                 <div style="font-weight: 700;">${dayName}</div>
                                                 <div style="font-size: 0.9rem; color: #666;">${dateStr}</div>
                                             </div>
                                             <div class="forecast-icon-day">${getWeatherIcon(weatherCode)}</div>
-                                            <div class="forecast-condition">${getWeatherDescription(weatherCode)}</div>
+                                            <div class="forecast-condition">
+                                                ${getWeatherDescription(weatherCode)}
+                                                ${isToday ? '<span class="expand-icon" id="expandIcon">▼</span>' : ''}
+                                            </div>
                                             <div class="forecast-temp">
                                                 <span class="forecast-temp-high">${tempMax}°</span> / 
                                                 <span class="forecast-temp-low">${tempMin}°</span>
@@ -1551,12 +2766,113 @@
                                             </div>
                                         </div>
                                     `;
+                                    
+                                    // Add hourly forecast for today
+                                    if (isToday && hourly && hourly.time) {
+                                        // Get next 24 hours
+                                        const next24Hours = hourly.time.slice(currentHour, currentHour + 24);
+                                        
+                                        dayHTML += `
+                                            <div class="hourly-forecast" id="hourlyForecast">
+                                                <div class="hourly-header">
+                                                    🕐 Hourly Forecast (Next 24 Hours)
+                                                </div>
+                                                <div class="hourly-list">
+                                                    ${next24Hours.map((time, hIndex) => {
+                                                        const hourIndex = currentHour + hIndex;
+                                                        const hour = new Date(time).getHours();
+                                                        const isCurrent = hIndex === 0;
+                                                        const temp = Math.round(hourly.temperature_2m[hourIndex]);
+                                                        const precipProb = hourly.precipitation_probability ? hourly.precipitation_probability[hourIndex] : 0;
+                                                        const weatherCode = hourly.weather_code ? hourly.weather_code[hourIndex] : 0;
+                                                        const windSpeed = hourly.wind_speed_10m ? Math.round(hourly.wind_speed_10m[hourIndex]) : 0;
+                                                        
+                                                        const timeStr = hour === 0 ? '12 AM' : 
+                                                                       hour < 12 ? `${hour} AM` : 
+                                                                       hour === 12 ? '12 PM' : 
+                                                                       `${hour - 12} PM`;
+                                                        
+                                                        return `
+                                                            <div class="hourly-item ${isCurrent ? 'current' : ''}">
+                                                                <div class="hourly-time">
+                                                                    ${timeStr}${isCurrent ? ' (Now)' : ''}
+                                                                </div>
+                                                                <div class="hourly-icon">${getWeatherIcon(weatherCode)}</div>
+                                                                <div class="hourly-condition">${getWeatherDescription(weatherCode)}</div>
+                                                                <div class="hourly-temp">${temp}°C</div>
+                                                                <div class="hourly-details">
+                                                                    ${precipProb > 0 ? `💧 ${precipProb}%` : ''} 
+                                                                    ${windSpeed > 0 ? `💨 ${windSpeed} km/h` : ''}
+                                                                </div>
+                                                            </div>
+                                                        `;
+                                                    }).join('')}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }
+                                    
+                                    return dayHTML;
                                 }).join('')}
                             </div>
                         </div>
                     `;
                     
                     app.innerHTML += forecastHTML;
+                    
+                    // Build 24-hour forecast modal (now that we have confirmed hourly data exists)
+                    const currentHourForModal = new Date().getHours();
+                    const next24Hours = hourly.time.slice(currentHourForModal, currentHourForModal + 24);
+                    
+                    const modalHTML = `
+                        <div class="modal-overlay" id="hourlyModal" onclick="handleModalClick(event)">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="modal-title">
+                                        🕐 24-Hour Forecast
+                                    </div>
+                                    <button class="modal-close" onclick="closeHourlyModal()" aria-label="Close">
+                                        ×
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="modal-hourly-list">
+                                        ${next24Hours.map((time, hIndex) => {
+                                            const hourIndex = currentHourForModal + hIndex;
+                                            const hour = new Date(time).getHours();
+                                            const isCurrent = hIndex === 0;
+                                            const temp = Math.round(hourly.temperature_2m[hourIndex]);
+                                            const precipProb = hourly.precipitation_probability ? hourly.precipitation_probability[hourIndex] : 0;
+                                            const weatherCode = hourly.weather_code ? hourly.weather_code[hourIndex] : 0;
+                                            const windSpeed = hourly.wind_speed_10m ? Math.round(hourly.wind_speed_10m[hourIndex]) : 0;
+                                            
+                                            const timeStr = hour === 0 ? '12 AM' : 
+                                                           hour < 12 ? `${hour} AM` : 
+                                                           hour === 12 ? '12 PM' : 
+                                                           `${hour - 12} PM`;
+                                            
+                                            return `
+                                                <div class="modal-hourly-item ${isCurrent ? 'current' : ''}">
+                                                    <div class="modal-hour-time">
+                                                        ${timeStr}${isCurrent ? ' (Now)' : ''}
+                                                    </div>
+                                                    <div class="modal-hour-icon">${getWeatherIcon(weatherCode)}</div>
+                                                    <div class="modal-hour-condition">${getWeatherDescription(weatherCode)}</div>
+                                                    <div class="modal-hour-temp">${temp}°C</div>
+                                                    <div class="modal-hour-details">
+                                                        ${precipProb > 0 ? `💧 ${precipProb}% rain` : ''} 
+                                                        ${windSpeed > 0 ? `💨 ${windSpeed} km/h` : ''}
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    app.innerHTML += modalHTML;
                 }
                 
                 updateSaveButton();
@@ -1564,11 +2880,18 @@
                 
             } catch (error) {
                 console.error('StormWarn: Error loading weather:', error);
+                console.error('StormWarn: Error stack:', error.stack);
+                
                 app.innerHTML = `
                     <div class="card error">
-                        <h2>Failed to load weather data</h2>
-                        <p>${error.message}</p>
-                        <button class="btn" onclick="init()">Retry</button>
+                        <h2>⚠️ Failed to load weather data</h2>
+                        <p style="color: #666; margin: 1rem 0;">${error.message}</p>
+                        <p style="font-size: 0.9rem; color: #999; margin-bottom: 1rem;">
+                            Please check your internet connection and try again.
+                        </p>
+                        <button class="btn" onclick="init()" style="background: #0ea5e9; color: white; padding: 0.75rem 2rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+                            🔄 Retry
+                        </button>
                     </div>
                 `;
             }
