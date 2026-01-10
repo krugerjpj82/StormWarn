@@ -66,7 +66,7 @@ StormWarn is a professional-grade Progressive Web App (PWA) designed specificall
 
 ### Option 1: Use Hosted Version (Recommended)
 
-1. Visit: `https://stormwarn.app` (or your deployment URL)
+1. Visit: `https://bit.ly/StormWarn` (or your deployment URL)
 2. Click "📱 Add to Home Screen"
 3. Follow iOS/Android instructions
 4. Launch from home screen
@@ -99,7 +99,7 @@ git push origin main
 # Settings → Pages → Source: main branch → Save
 
 # Access at:
-# https://yourusername.github.io/stormwarn
+# https://krugerjpj82.github.io/stormwarn
 ```
 
 ---
@@ -362,7 +362,7 @@ radar for strike locations.
 ⚠️ Active Warnings:
 ⚡ Level 6 - Thunderstorm Warning
 
-🔗 Get StormWarn: https://stormwarn.app
+🔗 Get StormWarn: https://bit.ly/StormWarn
 ```
 
 **Features:**
@@ -487,7 +487,7 @@ git push origin main
 # Settings → Pages → Source: main branch → Save
 
 # 3. Access
-# https://username.github.io/stormwarn
+# https://krugerjpj82.github.io/stormwarn
 ```
 
 ### Netlify (Drag & Drop)
@@ -923,7 +923,7 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 ### Created By
 
-**Anonymous Developer**
+**JP Kruger**
 - South Africa 🇿🇦
 - 2024
 
@@ -957,7 +957,7 @@ Built for South African users who need:
 **Community:**
 - GitHub Discussions
 - GitHub Issues
-- Email: support@stormwarn.app
+- Email: stormwarnza@gmail.com
 
 **Emergency:**
 - South African Weather Service: [www.weathersa.co.za](https://www.weathersa.co.za)
@@ -1022,7 +1022,7 @@ If you find StormWarn useful, please star the repository! ⭐
 - 📦 **Repository:** [github.com/krugerjpj82/stormwarn](https://github.com/krugerjpj82/stormwarn)
 - 🐛 **Issues:** [github.com/krugerjpj82name/stormwarn/issues](https://github.com/krugerjpj82/stormwarn/issues)
 - 💬 **Discussions:** [github.com//stormwarn/discussions](https:/krugerjpj82/github.com//stormwarn/discussions)
-- 📧 **Email:** stormwarnza"gmail.com
+- 📧 **Email:** stormwarnza@gmail.com
 
 ---
 
